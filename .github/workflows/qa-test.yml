@@ -1,0 +1,26 @@
+name: QA API Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  api-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call test API
+        run: |
+          echo "Running API test..."
+          response=$(curl -s https://jsonplaceholder.typicode.com/posts/1)
+          echo "Response:"
+          echo $response
+
+      - name: Validate response contains userId
+        run: |
+          response=$(curl -s https://jsonplaceholder.typicode.com/posts/1)
+          if echo "$response" | grep -q "userId"; then
+            echo "✅ Test Passed"
+          else
+            echo "❌ Test Failed"
+            exit 1
+          fi
