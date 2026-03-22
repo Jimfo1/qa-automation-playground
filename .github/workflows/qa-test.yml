@@ -1,23 +1,36 @@
-name: QA API Test
+name: QA API Test (Multi-Env)
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to test (uat or prod)"
+        required: true
+        default: "uat"
 
 jobs:
   api-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Call test API
+      - name: Set base URL
         run: |
-          echo "Running API test..."
-          response=$(curl -s https://jsonplaceholder.typicode.com/posts/1)
+          if [ "${{ github.event.inputs.environment }}" = "uat" ]; then
+            echo "BASE_URL=https://jsonplaceholder.typicode.com" >> $GITHUB_ENV
+          else
+            echo "BASE_URL=https://jsonplaceholder.typicode.com" >> $GITHUB_ENV
+          fi
+
+      - name: Call API
+        run: |
+          echo "Testing environment: $BASE_URL"
+          response=$(curl -s $BASE_URL/posts/1)
           echo "Response:"
           echo $response
 
-      - name: Validate response contains userId
+      - name: Validate response
         run: |
-          response=$(curl -s https://jsonplaceholder.typicode.com/posts/1)
+          response=$(curl -s $BASE_URL/posts/1)
           if echo "$response" | grep -q "userId"; then
             echo "✅ Test Passed"
           else
