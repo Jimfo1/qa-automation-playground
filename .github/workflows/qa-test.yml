@@ -1,15 +1,15 @@
-name: QA API Test (Multi-Env)
+name: QA Test Suite
 
 on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Environment to test (uat or prod)"
+        description: "Environment (uat or prod)"
         required: true
         default: "uat"
 
 jobs:
-  api-test:
+  test-suite:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,19 +21,32 @@ jobs:
             echo "BASE_URL=https://jsonplaceholder.typicode.com" >> $GITHUB_ENV
           fi
 
-      - name: Call API
-        run: |
-          echo "Testing environment: $BASE_URL"
-          response=$(curl -s $BASE_URL/posts/1)
-          echo "Response:"
-          echo $response
-
-      - name: Validate response
+      - name: Test Case 1 - Get Post
         run: |
           response=$(curl -s $BASE_URL/posts/1)
           if echo "$response" | grep -q "userId"; then
-            echo "✅ Test Passed"
+            echo "TC1 Passed"
           else
-            echo "❌ Test Failed"
+            echo "TC1 Failed"
+            exit 1
+          fi
+
+      - name: Test Case 2 - Check Title Exists
+        run: |
+          response=$(curl -s $BASE_URL/posts/1)
+          if echo "$response" | grep -q "title"; then
+            echo "TC2 Passed"
+          else
+            echo "TC2 Failed"
+            exit 1
+          fi
+
+      - name: Test Case 3 - Simulate Failure (like real defect)
+        run: |
+          response=$(curl -s $BASE_URL/posts/1)
+          if echo "$response" | grep -q "nonexistentField"; then
+            echo "TC3 Passed"
+          else
+            echo "❌ TC3 Failed - Field missing (Simulated defect)"
             exit 1
           fi
