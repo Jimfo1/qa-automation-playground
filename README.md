@@ -1,4 +1,4 @@
-# Weather QA Automation Course
+# QA Automation Course
 
 A beginner-friendly QA automation training project using GitHub, github.dev, GitHub Actions, GitHub Pages, Playwright, and the Open-Meteo weather API.
 
